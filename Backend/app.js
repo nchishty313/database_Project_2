@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -5,14 +6,18 @@ const cors = require("cors");
 const session = require("express-session");
 const pool = require("./db");
 
+// Customer and product routes
 const productRoutes = require("./productRoutes");
 const clientRoutes = require("./clientRoutes");
 const projectRoutes = require("./projectRoutes");
+
+// Staff routes
 const staffRoutes = require("./staffRoutes");
+const staffProjectRoutes = require("./staffProjectRoutes");
 
 const app = express();
 
-// CORS
+// CORS configuration
 app.use(cors({
     origin: "http://localhost",
     credentials: true
@@ -31,11 +36,14 @@ app.use(session({
     }
 }));
 
-// Customer and staff API routes
+// Register customer and product API routes
 app.use("/api", productRoutes);
 app.use("/api", clientRoutes);
 app.use("/api", projectRoutes);
+
+// Register staff API routes
 app.use("/api", staffRoutes);
+app.use("/api", staffProjectRoutes);
 
 // Database health check
 app.get("/api/health", async (req, res) => {
@@ -73,3 +81,5 @@ app.listen(PORT, () => {
         `Server running at http://localhost:${PORT}`
     );
 });
+
+

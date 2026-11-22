@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anna - Staff Dashboard</title>
+    <title>Flooring Management - Staff Dashboard</title>
 
     <style>
         body {
@@ -31,6 +32,11 @@
             padding: 10px 16px;
             border: none;
             border-radius: 5px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .logout {
@@ -95,7 +101,7 @@
             background: #e5eeee;
         }
 
-        #message {
+        #message, #projectsMessage {
             margin-top: 15px;
         }
 
@@ -103,9 +109,100 @@
             overflow-x: auto;
         }
 
-        @media(max-width: 650px) {
+        .project-card {
+            border: 1px solid #d9e0e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #fafbfc;
+        }
+
+        .project-card h4 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        .project-card p {
+            line-height: 1.6;
+            margin: 8px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .project-status {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #e5eeee;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .project-rooms {
+            margin-top: 16px;
+        }
+
+        .project-photos {
+            margin-top: 16px;
+        }
+
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .photo-gallery img {
+            width: 160px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .reject-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .reject-section textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .reject-button {
+            margin-top: 10px;
+            background: #b33434;
+            color: white;
+        }
+
+        .project-action-message {
+            margin-top: 10px;
+        }
+
+        .project-heading-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 650px) {
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 18px;
+            }
+
+            main {
+                padding: 0 12px;
+            }
+
+            .card {
+                padding: 16px;
             }
         }
     </style>
@@ -120,9 +217,10 @@
 
 <main>
 
-    <h2>Welcome, Anna!</h2>
-    <p>Manage flooring products and customer requests.</p>
+    <h2>Staff Dashboard</h2>
+    <p>Manage flooring products and customer project requests.</p>
 
+    <!-- ADD FLOORING PRODUCT -->
     <section class="card">
 
         <h3>Add New Flooring Product</h3>
@@ -132,38 +230,43 @@
             <div class="form-grid">
 
                 <div>
-                    <label>Product Name</label>
+                    <label for="product_name">Product Name</label>
                     <input id="product_name" required>
                 </div>
 
                 <div>
-                    <label>Category</label>
+                    <label for="category">Category</label>
                     <input id="category" required>
                 </div>
 
                 <div>
-                    <label>Brand</label>
+                    <label for="brand">Brand</label>
                     <input id="brand">
                 </div>
 
                 <div>
-                    <label>Material Style</label>
+                    <label for="material_style">Material Style</label>
                     <input id="material_style">
                 </div>
 
                 <div>
-                    <label>Color</label>
+                    <label for="color">Color</label>
                     <input id="color">
                 </div>
 
                 <div>
-                    <label>Unit Price</label>
-                    <input id="unit_price" type="number"
-                           min="0" step="0.01" required>
+                    <label for="unit_price">Unit Price</label>
+                    <input
+                        id="unit_price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
                 </div>
 
                 <div>
-                    <label>Pricing Unit</label>
+                    <label for="pricing_unit">Pricing Unit</label>
                     <select id="pricing_unit" required>
                         <option value="SQFT">Square Feet</option>
                         <option value="BOX">Box</option>
@@ -172,18 +275,24 @@
                 </div>
 
                 <div>
-                    <label>Dimensions</label>
+                    <label for="dimensions">Dimensions</label>
                     <input id="dimensions">
                 </div>
 
                 <div>
-                    <label>Square Feet Per Package</label>
-                    <input id="sqft_per_package"
-                           type="number" min="0.01" step="0.01">
+                    <label for="sqft_per_package">
+                        Square Feet Per Package
+                    </label>
+                    <input
+                        id="sqft_per_package"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                    >
                 </div>
 
                 <div>
-                    <label>Description</label>
+                    <label for="description">Description</label>
                     <textarea id="description"></textarea>
                 </div>
 
@@ -195,17 +304,21 @@
 
         </form>
 
-        <p id="message"></p>
+        <p id="message" role="status"></p>
 
     </section>
 
+    <!-- FLOORING INVENTORY -->
     <section class="card">
 
         <h3>Flooring Product Inventory</h3>
 
-        <button id="refreshButton">Refresh Products</button>
+        <button id="refreshButton">
+            Refresh Products
+        </button>
 
         <div class="table-wrapper">
+
             <table>
                 <thead>
                     <tr>
@@ -220,7 +333,28 @@
 
                 <tbody id="productTable"></tbody>
             </table>
+
         </div>
+
+    </section>
+
+    <!-- CUSTOMER PROJECT REQUESTS -->
+    <section class="card">
+
+        <h3>Customer Project Requests</h3>
+
+        <p>
+            View customer requests, room details,
+            selected flooring products and photographs.
+        </p>
+
+        <button id="refreshProjectsButton">
+            Refresh Project Requests
+        </button>
+
+        <p id="projectsMessage" role="status"></p>
+
+        <div id="projectsContainer"></div>
 
     </section>
 
@@ -230,4 +364,5 @@
 
 </body>
 </html>
+
 
