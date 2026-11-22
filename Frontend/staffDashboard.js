@@ -150,7 +150,7 @@ async function updateProductStatus(productId, active) {
 
     try {
         const response = await fetch(
-            `API/admin/products/{productId}/status`,
+            `${API}/admin/products/${productId}/status`,
             {
                 method: "PATCH",
                 headers: {
