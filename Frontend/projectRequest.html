@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Flooring Project</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f5f7;
+            margin: 0;
+            padding: 30px 15px;
+            color: #263238;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        }
+
+        h1, h2 {
+            color: #245b75;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .room-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 15px;
+            background: #fafafa;
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .room-area {
+            margin-top: 12px;
+            font-weight: bold;
+            color: #245b75;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .checkbox-row input {
+            width: auto;
+        }
+
+        .checkbox-row label {
+            margin: 0;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: #245b75;
+            color: white;
+        }
+
+        .secondary {
+            background: #e4edf2;
+            color: #245b75;
+        }
+
+        .remove {
+            background: #f8dddd;
+            color: #a32626;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .total {
+            background: #eaf3f7;
+            padding: 18px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-weight: bold;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: #bd2525;
+        }
+
+        .project-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 7px;
+        }
+
+        /* PHOTO PREVIEW */
+
+        #photoPreview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .photo-item {
+            width: 145px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 105px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .photo-item p {
+            overflow-wrap: anywhere;
+            font-size: 12px;
+        }
+
+        .photo-item button {
+            width: 100%;
+            margin-top: 7px;
+        }
+
+        .photo-help {
+            color: #5b6870;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- PROJECT HEADING -->
+
+    <div class="panel">
+
+        <h1>Flooring Project Request</h1>
+
+        <p>
+            Submit your flooring requirements and receive
+            a quotation from our team.
+        </p>
+
+        <p id="customerInfo">Checking customer login...</p>
+
+        <p id="authMessage" class="message"></p>
+
+    </div>
+
+    <form id="projectForm">
+
+        <!-- PROJECT INFORMATION -->
+
+        <div class="panel">
+
+            <h2>Project Information</h2>
+
+            <label for="serviceAddress">
+                Installation Address *
+            </label>
+
+            <input
+                type="text"
+                id="serviceAddress"
+                required
+                placeholder="Enter installation address"
+            >
+
+            <div class="form-grid">
+
+                <div>
+
+                    <label for="preferredStart">
+                        Preferred Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="preferredStart"
+                    >
+
+                </div>
+
+                <div>
+
+                    <label for="preferredEnd">
+                        Preferred End Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="preferredEnd"
+                    >
+
+                </div>
+
+            </div>
+
+            <label for="budget">
+                Proposed Budget ($)
+            </label>
+
+            <input
+                type="number"
+                id="budget"
+                min="0"
+                step="0.01"
+                placeholder="Enter your budget"
+            >
+
+            <label for="notes">
+                Additional Project Notes
+            </label>
+
+            <textarea
+                id="notes"
+                placeholder="Describe any special requirements..."
+            ></textarea>
+
+        </div>
+
+        <!-- ROOM INFORMATION -->
+
+        <div class="panel">
+
+            <h2>Room Information</h2>
+
+            <p>
+                Add every room that needs flooring installation.
+            </p>
+
+            <div id="roomsContainer"></div>
+
+            <button
+                type="button"
+                class="secondary"
+                id="addRoomButton"
+            >
+                + Add Another Room
+            </button>
+
+            <div class="total">
+
+                Total Project Area:
+
+                <span id="totalArea">0.00</span> sq. ft.
+
+            </div>
+
+        </div>
+
+        <!-- PROJECT PHOTOGRAPHS -->
+
+        <div class="panel">
+
+            <h2>Project Photographs</h2>
+
+            <p class="photo-help">
+                Upload up to 5 photographs associated with this
+                flooring project.
+
+                Accepted formats: JPG, PNG and WEBP.
+
+                Maximum size: 5 MB per photo.
+            </p>
+
+            <label for="projectPhotos">
+                Choose photographs
+            </label>
+
+            <input
+                type="file"
+                id="projectPhotos"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+            >
+
+            <p id="photoCount">
+                0 of 5 photographs selected
+            </p>
+
+            <div id="photoPreview"></div>
+
+        </div>
+
+        <!-- SUBMIT PROJECT -->
+
+        <div class="panel">
+
+            <button
+                type="submit"
+                class="primary"
+                id="submitButton"
+            >
+                Submit Project Request
+            </button>
+
+            <p id="message" class="message"></p>
+
+            <button
+                type="button"
+                class="secondary"
+                id="retryPhotoUpload"
+                hidden
+            >
+                Retry Photo Upload
+            </button>
+
+        </div>
+
+    </form>
+
+    <!-- CUSTOMER PROJECT HISTORY -->
+
+    <div class="panel">
+
+        <h2>My Submitted Projects</h2>
+
+        <button
+            type="button"
+            class="secondary"
+            id="refreshProjects"
+        >
+            Refresh Projects
+        </button>
+
+        <div id="myProjects">
+            No projects loaded yet.
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ROOM TEMPLATE -->
+
+<template id="roomTemplate">
+
+    <div class="room-card">
+
+        <div class="room-header">
+
+            <h3 class="room-title">Room</h3>
+
+            <button
+                type="button"
+                class="remove removeRoom"
+            >
+                Remove
+            </button>
+
+        </div>
+
+        <label>Room Name *</label>
+
+        <input
+            type="text"
+            class="roomName"
+            placeholder="Example: Living Room"
+            required
+        >
+
+        <label>Flooring Product *</label>
+
+        <select class="productSelect" required>
+
+            <option value="">
+                Select flooring product
+            </option>
+
+        </select>
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>Length (feet) *</label>
+
+                <input
+                    type="number"
+                    class="roomLength"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+            <div>
+
+                <label>Width (feet) *</label>
+
+                <input
+                    type="number"
+                    class="roomWidth"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+        </div>
+
+        <p class="room-area">
+
+            Room Area:
+
+            <span class="areaValue">0.00</span> sq. ft.
+
+        </p>
+
+        <label>Existing Flooring Type</label>
+
+        <select class="existingFloor">
+
+            <option value="">
+                Select existing flooring
+            </option>
+
+            <option value="Carpet">Carpet</option>
+            <option value="Wood">Wood</option>
+            <option value="Tile">Tile</option>
+            <option value="Vinyl">Vinyl</option>
+            <option value="Laminate">Laminate</option>
+            <option value="Concrete">Concrete</option>
+            <option value="Other">Other</option>
+
+        </select>
+
+        <div class="checkbox-row">
+
+            <input
+                type="checkbox"
+                class="removalRequired"
+            >
+
+            <label>
+                Existing flooring needs removal
+            </label>
+
+        </div>
+
+        <label>Installation Pattern</label>
+
+        <select class="installationPattern">
+
+            <option value="">
+                Select pattern
+            </option>
+
+            <option value="Straight">Straight</option>
+            <option value="Diagonal">Diagonal</option>
+            <option value="Herringbone">Herringbone</option>
+            <option value="Staggered">Staggered</option>
+            <option value="Other">Other</option>
+
+        </select>
+
+    </div>
+
+</template>
+
+<!-- JAVASCRIPT -->
+
+<script src="projectRequest.js"></script>
+
+</body>
+</html>

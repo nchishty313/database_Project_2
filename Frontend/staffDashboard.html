@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flooring Management - Staff Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f7;
+            color: #263746;
+        }
+
+        header {
+            background: #243d50;
+            color: white;
+            padding: 20px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .logout {
+            background: #e7e7e7;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 9px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 7px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .add-button {
+            background: #245b75;
+            color: white;
+            margin-top: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #edf1f4;
+        }
+
+        .status-button {
+            background: #e5eeee;
+        }
+
+        #message, #projectsMessage {
+            margin-top: 15px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .project-card {
+            border: 1px solid #d9e0e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #fafbfc;
+        }
+
+        .project-card h4 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        .project-card p {
+            line-height: 1.6;
+            margin: 8px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .project-status {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #e5eeee;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .project-rooms {
+            margin-top: 16px;
+        }
+
+        .project-photos {
+            margin-top: 16px;
+        }
+
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .photo-gallery img {
+            width: 160px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .reject-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .reject-section textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .reject-button {
+            margin-top: 10px;
+            background: #b33434;
+            color: white;
+        }
+
+        .project-action-message {
+            margin-top: 10px;
+        }
+
+        .project-heading-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 650px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 18px;
+            }
+
+            main {
+                padding: 0 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>Flooring Management</h2>
+    <button class="logout" id="logoutButton">Logout</button>
+</header>
+
+<main>
+
+    <h2>Staff Dashboard</h2>
+    <p>Manage flooring products and customer project requests.</p>
+
+    <!-- ADD FLOORING PRODUCT -->
+    <section class="card">
+
+        <h3>Add New Flooring Product</h3>
+
+        <form id="productForm">
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="product_name">Product Name</label>
+                    <input id="product_name" required>
+                </div>
+
+                <div>
+                    <label for="category">Category</label>
+                    <input id="category" required>
+                </div>
+
+                <div>
+                    <label for="brand">Brand</label>
+                    <input id="brand">
+                </div>
+
+                <div>
+                    <label for="material_style">Material Style</label>
+                    <input id="material_style">
+                </div>
+
+                <div>
+                    <label for="color">Color</label>
+                    <input id="color">
+                </div>
+
+                <div>
+                    <label for="unit_price">Unit Price</label>
+                    <input
+                        id="unit_price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="pricing_unit">Pricing Unit</label>
+                    <select id="pricing_unit" required>
+                        <option value="SQFT">Square Feet</option>
+                        <option value="BOX">Box</option>
+                        <option value="PIECE">Piece</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="dimensions">Dimensions</label>
+                    <input id="dimensions">
+                </div>
+
+                <div>
+                    <label for="sqft_per_package">
+                        Square Feet Per Package
+                    </label>
+                    <input
+                        id="sqft_per_package"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                    >
+                </div>
+
+                <div>
+                    <label for="description">Description</label>
+                    <textarea id="description"></textarea>
+                </div>
+
+            </div>
+
+            <button class="add-button" type="submit">
+                Add Product
+            </button>
+
+        </form>
+
+        <p id="message" role="status"></p>
+
+    </section>
+
+    <!-- FLOORING INVENTORY -->
+    <section class="card">
+
+        <h3>Flooring Product Inventory</h3>
+
+        <button id="refreshButton">
+            Refresh Products
+        </button>
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="productTable"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- CUSTOMER PROJECT REQUESTS -->
+    <section class="card">
+
+        <h3>Customer Project Requests</h3>
+
+        <p>
+            View customer requests, room details,
+            selected flooring products and photographs.
+        </p>
+
+        <button id="refreshProjectsButton">
+            Refresh Project Requests
+        </button>
+
+        <p id="projectsMessage" role="status"></p>
+
+        <div id="projectsContainer"></div>
+
+    </section>
+
+</main>
+
+<script src="staffDashboard.js"></script>
+
+</body>
+</html>
+
+
