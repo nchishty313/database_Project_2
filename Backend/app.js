@@ -15,6 +15,9 @@ const projectRoutes = require("./projectRoutes");
 const staffRoutes = require("./staffRoutes");
 const staffProjectRoutes = require("./staffProjectRoutes");
 
+// Quotation routes
+const quoteRoutes = require("./quoteRoutes");
+
 const app = express();
 
 // CORS configuration
@@ -44,6 +47,9 @@ app.use("/api", projectRoutes);
 // Register staff API routes
 app.use("/api", staffRoutes);
 app.use("/api", staffProjectRoutes);
+
+// Register quotation API routes
+app.use("/api", quoteRoutes);
 
 // Database health check
 app.get("/api/health", async (req, res) => {
@@ -81,5 +87,3 @@ app.listen(PORT, () => {
         `Server running at http://localhost:${PORT}`
     );
 });
-
-
