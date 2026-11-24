@@ -11,7 +11,7 @@ const projectsContainer =
 const projectsMessage =
     document.getElementById("projectsMessage");
 
-// Keep track of temporary photo URLs so they can be cleaned up.
+// Keep track of temporary photo URLs.
 let projectPhotoUrls = [];
 
 // GENERAL HELPERS
@@ -32,6 +32,7 @@ function addProjectDetail(container, label, value) {
 
     strong.textContent = label + ": ";
     paragraph.appendChild(strong);
+
     paragraph.appendChild(
         document.createTextNode(
             value === null ||
@@ -49,18 +50,19 @@ function formatDate(value) {
     if (!value) return "Not provided";
 
     const text = String(value);
-
-    // Date-only values should not shift because of timezone.
     const match = text.match(/^\d{4}-\d{2}-\d{2}/);
+
     if (match) return match[0];
 
     return text;
 }
 
 function formatMoney(value) {
-    if (value === null ||
+    if (
+        value === null ||
         value === undefined ||
-        value === "") {
+        value === ""
+    ) {
         return "Not provided";
     }
 
@@ -71,6 +73,28 @@ function formatMoney(value) {
     }
 
     return "$" + amount.toFixed(2);
+}
+
+// READ API RESPONSE SAFELY
+async function readApiResponse(response) {
+    const contentType =
+        response.headers.get("content-type") || "";
+
+    if (!contentType.includes("application/json")) {
+        const responseText = await response.text();
+
+        console.error(
+            "Unexpected non-JSON API response:",
+            response.status,
+            responseText.slice(0, 300)
+        );
+
+        throw new Error(
+            `Server returned an unexpected response (HTTP ${response.status}). Check the API URL and backend server.`
+        );
+    }
+
+    return response.json();
 }
 
 // CHECK STAFF LOGIN SESSION
@@ -93,6 +117,7 @@ async function checkStaffSession() {
             "Cannot connect to server.",
             true
         );
+
         return false;
     }
 }
@@ -102,7 +127,9 @@ async function loadProducts() {
     try {
         const response = await fetch(
             `${API}/admin/products`,
-            { credentials: "include" }
+            {
+                credentials: "include"
+            }
         );
 
         if (response.status === 401) {
@@ -114,7 +141,7 @@ async function loadProducts() {
             throw new Error("Unable to load products.");
         }
 
-        const products = await response.json();
+        const products = await readApiResponse(response);
 
         productTable.replaceChildren();
 
@@ -130,10 +157,12 @@ async function loadProducts() {
             addCell(product.product_id);
             addCell(product.product_name);
             addCell(product.category);
+
             addCell(
                 "$" + product.unit_price +
                 " / " + product.pricing_unit
             );
+
             addCell(
                 Number(product.active) === 1
                     ? "Active"
@@ -161,6 +190,7 @@ async function loadProducts() {
 
             actionCell.appendChild(button);
             row.appendChild(actionCell);
+
             productTable.appendChild(row);
         });
 
@@ -236,7 +266,7 @@ productForm.addEventListener(
                 }
             );
 
-            const result = await response.json();
+            const result = await readApiResponse(response);
 
             if (!response.ok) {
                 throw new Error(
@@ -247,6 +277,7 @@ productForm.addEventListener(
             showMessage(message, result.message);
 
             productForm.reset();
+
             await loadProducts();
 
         } catch (error) {
@@ -259,7 +290,7 @@ productForm.addEventListener(
 async function updateProductStatus(productId, active) {
     try {
         const response = await fetch(
-            `API/admin/products/{productId}/status`,
+            `${API}/admin/products/${productId}/status`,
             {
                 method: "PATCH",
                 headers: {
@@ -270,7 +301,7 @@ async function updateProductStatus(productId, active) {
             }
         );
 
-        const result = await response.json();
+        const result = await readApiResponse(response);
 
         if (!response.ok) {
             throw new Error(
@@ -279,6 +310,7 @@ async function updateProductStatus(productId, active) {
         }
 
         showMessage(message, result.message);
+
         await loadProducts();
 
     } catch (error) {
@@ -316,10 +348,13 @@ async function loadProjects() {
             );
         }
 
-        const projects = await response.json();
+        const projects = await readApiResponse(response);
 
-        // Remove old photo previews and their temporary URLs.
-        projectPhotoUrls.forEach(url => URL.revokeObjectURL(url));
+        // Remove old photo previews.
+        projectPhotoUrls.forEach(url => {
+            URL.revokeObjectURL(url);
+        });
+
         projectPhotoUrls = [];
 
         projectsContainer.replaceChildren();
@@ -329,6 +364,7 @@ async function loadProjects() {
                 projectsMessage,
                 "No customer project requests found."
             );
+
             return;
         }
 
@@ -436,6 +472,7 @@ function displayProject(project) {
         roomsSection.appendChild(
             createTextElement("p", "No rooms found.")
         );
+
     } else {
         const tableWrapper = document.createElement("div");
         tableWrapper.className = "table-wrapper";
@@ -470,17 +507,22 @@ function displayProject(project) {
             const values = [
                 room.room_name,
                 room.product_name,
+
                 room.length_ft == null
                     ? "-"
                     : `${room.length_ft} ft.`,
+
                 room.width_ft == null
                     ? "-"
                     : `${room.width_ft} ft.`,
+
                 `${room.area_sqft} sq. ft.`,
                 room.existing_floor_type || "-",
+
                 Number(room.removal_required) === 1
                     ? "Yes"
                     : "No",
+
                 room.installation_pattern || "-"
             ];
 
@@ -514,16 +556,19 @@ function displayProject(project) {
         photosSection.appendChild(
             createTextElement("p", "No photographs uploaded.")
         );
+
     } else {
         const gallery = document.createElement("div");
         gallery.className = "photo-gallery";
 
         photos.forEach(photo => {
             const image = document.createElement("img");
-            image.alt = `Project ${project.project_id} photograph`;
+
+            image.alt =
+                `Project ${project.project_id} photograph`;
+
             image.loading = "lazy";
 
-            // Fetch photos with the staff session cookie.
             loadStaffPhoto(photo.photo_id, image);
 
             gallery.appendChild(image);
@@ -555,7 +600,7 @@ function displayProject(project) {
 async function loadStaffPhoto(photoId, imageElement) {
     try {
         const response = await fetch(
-            `API/admin/photos/{photoId}`,
+            `${API}/admin/photos/${photoId}`,
             {
                 credentials: "include"
             }
@@ -572,12 +617,15 @@ async function loadStaffPhoto(photoId, imageElement) {
         }
 
         const url = URL.createObjectURL(blob);
+
         projectPhotoUrls.push(url);
 
         if (!imageElement.isConnected) {
             URL.revokeObjectURL(url);
+
             projectPhotoUrls =
                 projectPhotoUrls.filter(item => item !== url);
+
             return;
         }
 
@@ -610,6 +658,7 @@ function addRejectControls(card, project) {
     reasonInput.maxLength = 2000;
 
     const inputId = `reject-reason-${project.project_id}`;
+
     reasonInput.id = inputId;
     label.htmlFor = inputId;
 
@@ -622,6 +671,7 @@ function addRejectControls(card, project) {
     button.className = "reject-button";
 
     const actionMessage = document.createElement("p");
+
     actionMessage.className = "project-action-message";
     actionMessage.setAttribute("role", "status");
 
@@ -634,6 +684,7 @@ function addRejectControls(card, project) {
                 "Please enter a rejection reason of at least 5 characters.",
                 true
             );
+
             return;
         }
 
@@ -647,18 +698,21 @@ function addRejectControls(card, project) {
 
         try {
             const response = await fetch(
-                `API/admin/projects/{project.project_id}/reject`,
+                `${API}/admin/projects/${project.project_id}/reject`,
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
+
                     credentials: "include",
+
                     body: JSON.stringify({ reason })
                 }
             );
 
-            const result = await response.json();
+            const result = await readApiResponse(response);
 
             if (!response.ok) {
                 throw new Error(
@@ -679,6 +733,7 @@ function addRejectControls(card, project) {
                 error.message,
                 true
             );
+
         } finally {
             button.disabled = false;
         }
@@ -734,6 +789,3 @@ document.getElementById("logoutButton")
         ]);
     }
 })();
-
-
-

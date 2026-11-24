@@ -1,3 +1,4 @@
+
 const API = "http://localhost:5050/api";
 
 const projectForm = document.getElementById("projectForm");
@@ -218,7 +219,6 @@ addRoomButton.addEventListener("click", function() {
 // --------------------------------------------------
 
 photoInput.addEventListener("change", function() {
-
     const files = Array.from(photoInput.files);
 
     if (files.length > 5) {
@@ -240,7 +240,6 @@ photoInput.addEventListener("change", function() {
     ];
 
     for (const file of files) {
-
         if (!allowedTypes.includes(file.type)) {
             photoInput.value = "";
 
@@ -278,7 +277,6 @@ photoInput.addEventListener("change", function() {
 // --------------------------------------------------
 
 function renderPhotoPreviews() {
-
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     previewUrls = [];
 
@@ -288,7 +286,6 @@ function renderPhotoPreviews() {
         `${selectedPhotos.length} of 5 photographs selected`;
 
     selectedPhotos.forEach((file, index) => {
-
         const item = document.createElement("div");
         item.className = "photo-item";
 
@@ -311,13 +308,11 @@ function renderPhotoPreviews() {
         removeButton.textContent = "Remove";
 
         removeButton.addEventListener("click", function() {
-
             selectedPhotos.splice(index, 1);
 
             photoInput.value = "";
 
             renderPhotoPreviews();
-
         });
 
         item.appendChild(image);
@@ -325,7 +320,6 @@ function renderPhotoPreviews() {
         item.appendChild(removeButton);
 
         photoPreview.appendChild(item);
-
     });
 }
 
@@ -334,7 +328,6 @@ function renderPhotoPreviews() {
 // --------------------------------------------------
 
 async function uploadProjectPhotos(projectId) {
-
     if (selectedPhotos.length === 0) {
         return {
             photos_uploaded: 0
@@ -372,7 +365,6 @@ async function uploadProjectPhotos(projectId) {
 // --------------------------------------------------
 
 function resetAfterSuccessfulSubmission() {
-
     projectForm.reset();
 
     selectedPhotos = [];
@@ -406,9 +398,7 @@ function resetAfterSuccessfulSubmission() {
 // --------------------------------------------------
 
 retryPhotoUploadButton.addEventListener("click", async function() {
-
     if (!pendingPhotoProjectId || selectedPhotos.length === 0) {
-
         showMessage(
             message,
             "Please select the photos again before retrying.",
@@ -421,7 +411,6 @@ retryPhotoUploadButton.addEventListener("click", async function() {
     retryPhotoUploadButton.disabled = true;
 
     try {
-
         const result = await uploadProjectPhotos(pendingPhotoProjectId);
 
         const completedProjectId = pendingPhotoProjectId;
@@ -437,13 +426,10 @@ retryPhotoUploadButton.addEventListener("click", async function() {
         await loadMyProjects();
 
     } catch (error) {
-
         showMessage(message, error.message, "error");
 
     } finally {
-
         retryPhotoUploadButton.disabled = false;
-
     }
 });
 
@@ -452,11 +438,9 @@ retryPhotoUploadButton.addEventListener("click", async function() {
 // --------------------------------------------------
 
 projectForm.addEventListener("submit", async function(event) {
-
     event.preventDefault();
 
     if (!customerLoggedIn) {
-
         showMessage(
             message,
             "Please log in before submitting.",
@@ -467,7 +451,6 @@ projectForm.addEventListener("submit", async function(event) {
     }
 
     if (pendingPhotoProjectId !== null) {
-
         showMessage(
             message,
             "Please finish uploading photos for your previous project first.",
@@ -488,7 +471,6 @@ projectForm.addEventListener("submit", async function(event) {
         document.getElementById("preferredEnd").value;
 
     if (startDate && endDate && endDate < startDate) {
-
         showMessage(
             message,
             "End date cannot be before start date.",
@@ -504,9 +486,7 @@ projectForm.addEventListener("submit", async function(event) {
     const rooms = [];
 
     for (const card of roomCards) {
-
         const room = {
-
             room_name: card.querySelector(".roomName").value.trim(),
 
             product_id: Number(
@@ -529,11 +509,9 @@ projectForm.addEventListener("submit", async function(event) {
 
             installation_pattern:
                 card.querySelector(".installationPattern").value
-
         };
 
         if (!room.product_id) {
-
             showMessage(
                 message,
                 "Please select a flooring product for every room.",
@@ -544,13 +522,11 @@ projectForm.addEventListener("submit", async function(event) {
         }
 
         rooms.push(room);
-
     }
 
     const budgetValue = document.getElementById("budget").value;
 
     const projectData = {
-
         service_address:
             document.getElementById("serviceAddress").value.trim(),
 
@@ -564,18 +540,15 @@ projectForm.addEventListener("submit", async function(event) {
         notes: document.getElementById("notes").value.trim(),
 
         rooms
-
     };
 
     try {
-
         submitButton.disabled = true;
         submitButton.textContent = "Submitting...";
 
         // FIRST: SUBMIT THE PROJECT
 
         const response = await fetch(`${API}/projects`, {
-
             method: "POST",
 
             headers: {
@@ -585,17 +558,14 @@ projectForm.addEventListener("submit", async function(event) {
             credentials: "include",
 
             body: JSON.stringify(projectData)
-
         });
 
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-
             throw new Error(
                 result.message || "Project submission failed."
             );
-
         }
 
         const projectId = result.project_id;
@@ -603,15 +573,12 @@ projectForm.addEventListener("submit", async function(event) {
         // SECOND: UPLOAD PHOTOS USING THE PROJECT ID
 
         if (selectedPhotos.length > 0) {
-
             pendingPhotoProjectId = projectId;
 
             try {
-
                 await uploadProjectPhotos(projectId);
 
             } catch (uploadError) {
-
                 retryPhotoUploadButton.hidden = false;
 
                 showMessage(
@@ -641,18 +608,14 @@ projectForm.addEventListener("submit", async function(event) {
         await loadMyProjects();
 
     } catch (error) {
-
         showMessage(message, error.message, "error");
 
     } finally {
-
         submitButton.disabled =
             !customerLoggedIn || pendingPhotoProjectId !== null;
 
         submitButton.textContent = "Submit Project Request";
-
     }
-
 });
 
 // --------------------------------------------------
@@ -660,18 +623,14 @@ projectForm.addEventListener("submit", async function(event) {
 // --------------------------------------------------
 
 async function loadMyProjects() {
-
     const projectsContainer =
         document.getElementById("myProjects");
 
     projectsContainer.textContent = "Loading projects...";
 
     try {
-
         const response = await fetch(`${API}/projects/mine`, {
-
             credentials: "include"
-
         });
 
         if (!response.ok) {
@@ -680,10 +639,9 @@ async function loadMyProjects() {
 
         const projects = await response.json();
 
-        projectsContainer.innerHTML = "";
+        projectsContainer.replaceChildren();
 
-        if (projects.length === 0) {
-
+        if (!Array.isArray(projects) || projects.length === 0) {
             projectsContainer.textContent =
                 "You have not submitted any projects yet.";
 
@@ -691,66 +649,90 @@ async function loadMyProjects() {
         }
 
         projects.forEach(project => {
-
             const item = document.createElement("div");
-
             item.className = "project-item";
 
-            const heading = document.createElement("h3");
+            // PROJECT ID
 
+            const heading = document.createElement("h3");
             heading.textContent =
                 `Project #${project.project_id}`;
 
             item.appendChild(heading);
 
-            const address = document.createElement("p");
+            // PROJECT ADDRESS
 
+            const address = document.createElement("p");
             address.textContent =
                 `Address: ${project.service_address}`;
 
             item.appendChild(address);
 
-            const area = document.createElement("p");
+            // TOTAL AREA
 
+            const area = document.createElement("p");
             area.textContent =
                 `Total Area: ${project.total_area_sqft} sq. ft.`;
 
             item.appendChild(area);
 
-            const status = document.createElement("p");
+            // PROJECT STATUS
 
+            const status = document.createElement("p");
             status.textContent =
                 `Status: ${project.status}`;
 
             item.appendChild(status);
 
-            const roomsHeading = document.createElement("strong");
+            // ------------------------------------------
+            // REJECTION REASON - NEW FUNCTIONALITY
+            // ------------------------------------------
 
+            if (project.status === "REJECTED") {
+                const rejectionBox = document.createElement("div");
+                rejectionBox.className = "rejection-reason";
+
+                const rejectionHeading = document.createElement("strong");
+                rejectionHeading.textContent = "Reason for rejection:";
+
+                const rejectionText = document.createElement("p");
+                rejectionText.textContent =
+                    project.rejection_reason ||
+                    "No rejection reason was provided.";
+
+                rejectionBox.appendChild(rejectionHeading);
+                rejectionBox.appendChild(rejectionText);
+
+                item.appendChild(rejectionBox);
+            }
+
+            // ------------------------------------------
+            // ROOM DETAILS
+            // ------------------------------------------
+
+            const roomsHeading = document.createElement("strong");
             roomsHeading.textContent = "Rooms:";
 
             item.appendChild(roomsHeading);
 
-            project.rooms.forEach(room => {
+            if (Array.isArray(project.rooms)) {
+                project.rooms.forEach(room => {
+                    const roomInfo = document.createElement("p");
 
-                const roomInfo = document.createElement("p");
+                    roomInfo.textContent =
+                        `${room.room_name} — ${room.product_name} — ${room.area_sqft} sq. ft.`;
 
-                roomInfo.textContent =
-                    `${room.room_name} — ${room.product_name} — ${room.area_sqft} sq. ft.`;
-
-                item.appendChild(roomInfo);
-
-            });
+                    item.appendChild(roomInfo);
+                });
+            }
 
             projectsContainer.appendChild(item);
-
         });
 
     } catch (error) {
-
         projectsContainer.textContent = error.message;
-
+        console.error("Unable to load project history:", error);
     }
-
 }
 
 // --------------------------------------------------
@@ -765,7 +747,6 @@ document.getElementById("refreshProjects")
 // --------------------------------------------------
 
 async function initializePage() {
-
     await Promise.all([
         checkCustomer(),
         loadProducts()
@@ -778,7 +759,6 @@ async function initializePage() {
     }
 
     renderPhotoPreviews();
-
 }
 
 initializePage();
